@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using PersonalFinancialManagement.Application.Features.Health;
+using PersonalFinancialManagement.Application.Features.Queries.GetHealth;
 
 namespace PersonalFinancialManagement.Api.Controllers;
 

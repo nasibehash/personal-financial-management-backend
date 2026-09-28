@@ -17,8 +17,20 @@ A layered ASP.NET Core Web API (.NET 10) for managing personal finances.
 - Pipeline behaviors (`Application/Common/Behaviors`): `LoggingBehavior` → `ValidationBehavior` → handler.
 - Validation uses FluentValidation. Validators in the Application assembly are registered automatically;
   failures return `400` with `ValidationProblemDetails` (see `Api/Middleware/ExceptionHandlingMiddleware.cs`).
-- Add new use cases under `Application/Features/<Feature>/` (request + handler + optional validator).
-  `Features/Health/GetHealthQuery.cs` is a minimal example.
+- Add new use cases as request + handler + optional validator, one folder per use case:
+  - Queries: `Application/Features/Queries/<Name>/` → namespace `PersonalFinancialManagement.Application.Features.Queries.<Name>`
+  - Commands: `Application/Features/Commands/<Name>/` → namespace `PersonalFinancialManagement.Application.Features.Commands.<Name>`
+
+  `Features/Queries/GetHealth/` is a minimal example.
+
+## NuGet packages
+
+| Project | Package | Version |
+|---|---|---|
+| Application | `MediatR` | 14.2.0 |
+| Application | `FluentValidation.DependencyInjectionExtensions` | 12.1.1 |
+| Application | `Microsoft.Extensions.Configuration.Abstractions` | 10.0.0 |
+| Api | `Microsoft.AspNetCore.OpenApi` | 10.0.12 |
 
 ### License key
 

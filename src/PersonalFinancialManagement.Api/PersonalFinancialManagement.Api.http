@@ -1,0 +1,6 @@
+@PersonalFinancialManagement.Api_HostAddress = http://localhost:5120
+
+GET {{PersonalFinancialManagement.Api_HostAddress}}/api/health
+Accept: application/json
+
+###

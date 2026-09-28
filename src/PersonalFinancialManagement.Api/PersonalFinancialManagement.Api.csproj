@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SpendWise.Application\SpendWise.Application.csproj" />
-    <ProjectReference Include="..\SpendWise.Infrastructure\SpendWise.Infrastructure.csproj" />
+    <ProjectReference Include="..\PersonalFinancialManagement.Application\PersonalFinancialManagement.Application.csproj" />
+    <ProjectReference Include="..\PersonalFinancialManagement.Infrastructure\PersonalFinancialManagement.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

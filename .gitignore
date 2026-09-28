@@ -491,4 +491,4 @@ $RECYCLE.BIN/
 appsettings.Local.json
 
 # User-uploaded files
-src/SpendWise.Api/wwwroot/uploads/
+src/PersonalFinancialManagement.Api/wwwroot/uploads/

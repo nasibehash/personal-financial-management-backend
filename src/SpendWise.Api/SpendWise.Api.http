@@ -1,6 +1,0 @@
-@SpendWise.Api_HostAddress = http://localhost:5120
-
-GET {{SpendWise.Api_HostAddress}}/api/health
-Accept: application/json
-
-###

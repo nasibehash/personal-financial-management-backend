@@ -38,14 +38,17 @@ environment variable. Without a key MediatR still works but logs a license warni
 | Application | `Microsoft.Extensions.Configuration.Abstractions` | 10.0.0 |
 | Api | `Microsoft.AspNetCore.OpenApi` | 10.0.12 |
 | Api | `Microsoft.EntityFrameworkCore.Design` | 10.0.12 |
-| Infrastructure | `Microsoft.EntityFrameworkCore.Sqlite` | 10.0.12 |
+| Infrastructure | `Microsoft.EntityFrameworkCore.SqlServer` | 10.0.12 |
 
-## Database (EF Core + SQLite)
+## Database (EF Core + SQL Server)
 
 - `Infrastructure/Persistence/ApplicationDbContext.cs` implements `Application/Interfaces/IApplicationDbContext`.
 - Entities inherit `Domain/Common/BaseEntity` (`Id`, `CreatedAtUtc`, `UpdatedAtUtc`); timestamps are set in `SaveChangesAsync`.
 - Put `IEntityTypeConfiguration<T>` classes in `Infrastructure/Persistence/Configurations/`; they are applied automatically.
-- Connection string: `ConnectionStrings:DefaultConnection` in `appsettings.json` (the `.db` file is git-ignored).
+- Connection string: `ConnectionStrings:DefaultConnection` in `appsettings.json`. The default targets SQL Server LocalDB
+  (installed with Visual Studio). For another server, override it in the git-ignored `appsettings.Local.json`, e.g.
+  - SQL Server Express: `Server=.\\SQLEXPRESS;Database=PersonalFinancialManagement;Trusted_Connection=True;TrustServerCertificate=True`
+  - SQL login / Docker: `Server=localhost,1433;Database=PersonalFinancialManagement;User Id=sa;Password=<password>;TrustServerCertificate=True`
 
 Migrations (install the tool once with `dotnet tool install --global dotnet-ef`):
 

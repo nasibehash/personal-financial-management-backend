@@ -23,6 +23,12 @@ A layered ASP.NET Core Web API (.NET 10) for managing personal finances.
 
   `Features/Queries/GetHealth/` is a minimal example.
 
+### License key
+
+MediatR 13+ is commercially licensed (a free Community license is available). Provide the key via
+`MediatR:LicenseKey` in the git-ignored `appsettings.Local.json`, user-secrets, or the `MEDIATR_LICENSE_KEY`
+environment variable. Without a key MediatR still works but logs a license warning.
+
 ## NuGet packages
 
 | Project | Package | Version |
@@ -47,12 +53,6 @@ Migrations (install the tool once with `dotnet tool install --global dotnet-ef`)
 dotnet ef migrations add InitialCreate --project src/PersonalFinancialManagement.Infrastructure --startup-project src/PersonalFinancialManagement.Api --output-dir Persistence/Migrations
 dotnet ef database update --project src/PersonalFinancialManagement.Infrastructure --startup-project src/PersonalFinancialManagement.Api
 ```
-
-### License key
-
-MediatR 13+ is commercially licensed (a free Community license is available). Provide the key via
-`MediatR:LicenseKey` in the git-ignored `appsettings.Local.json`, user-secrets, or the `MEDIATR_LICENSE_KEY`
-environment variable. Without a key MediatR still works but logs a license warning.
 
 ## Run
 

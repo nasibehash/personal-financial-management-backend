@@ -23,6 +23,12 @@ A layered ASP.NET Core Web API (.NET 10) for managing personal finances.
 
   `Features/Queries/GetHealth/` is a minimal example.
 
+### License key
+
+MediatR 13+ is commercially licensed (a free Community license is available). Provide the key via
+`MediatR:LicenseKey` in the git-ignored `appsettings.Local.json`, user-secrets, or the `MEDIATR_LICENSE_KEY`
+environment variable. Without a key MediatR still works but logs a license warning.
+
 ## NuGet packages
 
 | Project | Package | Version |
@@ -31,12 +37,25 @@ A layered ASP.NET Core Web API (.NET 10) for managing personal finances.
 | Application | `FluentValidation.DependencyInjectionExtensions` | 12.1.1 |
 | Application | `Microsoft.Extensions.Configuration.Abstractions` | 10.0.0 |
 | Api | `Microsoft.AspNetCore.OpenApi` | 10.0.12 |
+| Api | `Microsoft.EntityFrameworkCore.Design` | 10.0.12 |
+| Infrastructure | `Microsoft.EntityFrameworkCore.SqlServer` | 10.0.12 |
 
-### License key
+## Database (EF Core + SQL Server)
 
-MediatR 13+ is commercially licensed (a free Community license is available). Provide the key via
-`MediatR:LicenseKey` in the git-ignored `appsettings.Local.json`, user-secrets, or the `MEDIATR_LICENSE_KEY`
-environment variable. Without a key MediatR still works but logs a license warning.
+- `Infrastructure/Persistence/ApplicationDbContext.cs` implements `Application/Interfaces/IApplicationDbContext`.
+- Entities inherit `Domain/Common/BaseEntity` (`Id`, `CreatedAtUtc`, `UpdatedAtUtc`); timestamps are set in `SaveChangesAsync`.
+- Put `IEntityTypeConfiguration<T>` classes in `Infrastructure/Persistence/Configurations/`; they are applied automatically.
+- Connection string: `ConnectionStrings:DefaultConnection` in `appsettings.json`. The default targets SQL Server LocalDB
+  (installed with Visual Studio). For another server, override it in the git-ignored `appsettings.Local.json`, e.g.
+  - SQL Server Express: `Server=.\\SQLEXPRESS;Database=PersonalFinancialManagement;Trusted_Connection=True;TrustServerCertificate=True`
+  - SQL login / Docker: `Server=localhost,1433;Database=PersonalFinancialManagement;User Id=sa;Password=<password>;TrustServerCertificate=True`
+
+Migrations (install the tool once with `dotnet tool install --global dotnet-ef`):
+
+```bash
+dotnet ef migrations add InitialCreate --project src/PersonalFinancialManagement.Infrastructure --startup-project src/PersonalFinancialManagement.Api --output-dir Persistence/Migrations
+dotnet ef database update --project src/PersonalFinancialManagement.Infrastructure --startup-project src/PersonalFinancialManagement.Api
+```
 
 ## Run
 

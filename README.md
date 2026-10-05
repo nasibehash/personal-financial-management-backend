@@ -79,6 +79,20 @@ For a local PostgreSQL use `Host=localhost;Port=5432;Database=personal_financial
 (the migration creates the database if it does not exist and the user may create databases; otherwise create it first).
 If the app cannot reach the database at startup in Development it logs the server it tried and exits.
 
+## Deploying with Docker (Render)
+
+The `Dockerfile` in the repository root builds and runs the API; it listens on `$PORT` (default `8080`) and runs in the `Production` environment.
+On [Render](https://render.com) create a **Web Service** from this repository with the **Docker** runtime, set the health check path to `/api/health` and add these environment variables:
+
+| Variable | Value |
+|---|---|
+| `ConnectionStrings__DefaultConnection` | The Neon connection string (direct connection, no `-pooler`) |
+| `Jwt__SecretKey` | A long random secret, at least 32 characters |
+| `Database__MigrateOnStartup` | `true` to create or update the tables when the service starts (needed for the first deploy) |
+| `Ai__ApiKey` | Optional, see [AI](#ai) |
+
+The API has no CORS configuration; the frontend reaches it through a same-origin rewrite on Vercel. Render's free instances sleep when idle, so the first request after a pause is slow.
+
 ### Database migrations
 
 The initial migration is included (`Infrastructure/Persistence/Migrations`). After changing entities:

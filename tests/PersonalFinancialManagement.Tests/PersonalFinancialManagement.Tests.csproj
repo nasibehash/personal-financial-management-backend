@@ -20,6 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PersonalFinancialManagement.Api\PersonalFinancialManagement.Api.csproj" />
     <ProjectReference Include="..\..\src\PersonalFinancialManagement.Application\PersonalFinancialManagement.Application.csproj" />
     <ProjectReference Include="..\..\src\PersonalFinancialManagement.Infrastructure\PersonalFinancialManagement.Infrastructure.csproj" />
   </ItemGroup>

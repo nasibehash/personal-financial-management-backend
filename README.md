@@ -21,7 +21,7 @@ finances, with AI-assisted entry (text and voice) and short insights about their
 |---|---|
 | `PersonalFinancialManagement.Domain` | Entities and enums |
 | `PersonalFinancialManagement.Application` | Use cases as MediatR requests and handlers, validators, pipeline behaviors, abstractions |
-| `PersonalFinancialManagement.Infrastructure` | EF Core (SQL Server), JWT and password hashing, AI/speech clients |
+| `PersonalFinancialManagement.Infrastructure` | EF Core (PostgreSQL), JWT and password hashing, AI/speech clients |
 | `PersonalFinancialManagement.Api` | Controllers, authentication, error handling |
 | `PersonalFinancialManagement.Tests` | xUnit tests (handlers run through the real MediatR pipeline on in-memory SQLite) |
 
@@ -30,15 +30,15 @@ through `IApplicationDbContext`, there are no repositories.
 
 ## Getting started
 
-Requirements: the .NET 10 SDK and a SQL Server instance (LocalDB is enough).
+Requirements: the .NET 10 SDK and a PostgreSQL database, for example a free [Neon](https://neon.com) project (see [Database](#database-postgresql--neon)) or a local PostgreSQL.
 
 ```bash
 dotnet restore
 dotnet run --project src/PersonalFinancialManagement.Api
 ```
 
-In the Development environment pending EF Core migrations are applied automatically, so the database
-(`PersonalFinancialManagement`) is created on the first start. Sample requests for every endpoint are in
+Before the first run set your connection string (see [Database](#database-postgresql--neon)). In the Development environment pending
+EF Core migrations are applied automatically, so the tables are created on the first start. Sample requests for every endpoint are in
 `src/PersonalFinancialManagement.Api/PersonalFinancialManagement.Api.http` (register first; the token is stored for the following requests).
 
 ### Configuration
@@ -48,30 +48,36 @@ automatically) or in environment variables such as `Jwt__SecretKey`.
 
 | Setting | Notes |
 |---|---|
-| `ConnectionStrings:DefaultConnection` | Defaults to SQL Server LocalDB. Other examples: `Server=.\\SQLEXPRESS;Database=PersonalFinancialManagement;Trusted_Connection=True;TrustServerCertificate=True` or `Server=localhost,1433;Database=PersonalFinancialManagement;User Id=sa;Password=<password>;TrustServerCertificate=True` |
+| `ConnectionStrings:DefaultConnection` | PostgreSQL connection string, either a Neon `postgresql://...` URI or Npgsql `Host=...;Database=...` form. The default targets a local PostgreSQL (`localhost:5432`, user and password `postgres`). See [Database](#database-postgresql--neon). |
 | `Jwt:SecretKey` | **Required**, at least 32 characters. `appsettings.Development.json` contains a development-only key; set your own everywhere else. |
 | `Jwt:Issuer`, `Jwt:Audience`, `Jwt:ExpiryMinutes` | Token settings (defaults are fine). |
 | `Ai:ApiKey` | Optional, see [AI](#ai). |
 | `MediatR:LicenseKey` | MediatR 13+ is commercially licensed (a free Community license exists). Without a key it still works and logs a license warning. |
 
-### Database connection problems
+### Database (PostgreSQL / Neon)
 
-The default connection string uses SQL Server **LocalDB** (installed with Visual Studio). If it is not installed
-(`Unable to locate a Local Database Runtime installation`) or you use another SQL Server, create
-`src/PersonalFinancialManagement.Api/appsettings.Local.json` (git-ignored) with your connection string:
+The app uses PostgreSQL through EF Core (Npgsql). With [Neon](https://neon.com):
+
+1. Create a project and open **Connect** in the dashboard.
+2. Turn **Connection pooling off** and copy the connection string (the host must *not* contain `-pooler`). EF Core migrations take a
+   session-level lock that Neon's connection pooler does not support, so use the direct connection.
+3. Put it in `src/PersonalFinancialManagement.Api/appsettings.Local.json` (git-ignored, loaded automatically):
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=.\\SQLEXPRESS;Database=PersonalFinancialManagement;Trusted_Connection=True;TrustServerCertificate=True"
+    "DefaultConnection": "postgresql://neondb_owner:<password>@ep-xxxxxx.<region>.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
   }
 }
 ```
 
-Common values for `Server`: `.\SQLEXPRESS` (SQL Server Express), `localhost` or `.` (default instance), `localhost,1433` with
-`User Id=sa;Password=...` (Docker). To see which SQL Server services exist on Windows run `Get-Service *SQL*` in PowerShell
-(`MSSQL$SQLEXPRESS` means the instance is `.\SQLEXPRESS`, `MSSQLSERVER` means the default instance). If the app cannot reach the
-database at startup in Development it logs the server it tried and exits.
+or set the environment variable `ConnectionStrings__DefaultConnection`. The Neon URI can be pasted as it is; the Npgsql form
+(`Host=ep-xxxxxx.<region>.aws.neon.tech;Database=neondb;Username=neondb_owner;Password=<password>;SSL Mode=Require`) works too.
+Never commit the password. Neon pauses idle databases, so the first request after a pause can take a few seconds.
+
+For a local PostgreSQL use `Host=localhost;Port=5432;Database=personal_financial_management;Username=postgres;Password=<password>`
+(the migration creates the database if it does not exist and the user may create databases; otherwise create it first).
+If the app cannot reach the database at startup in Development it logs the server it tried and exits.
 
 ### Database migrations
 
@@ -151,7 +157,7 @@ Voice entry needs the provider and answers `503` when it is not configured.
 | Application | `FluentValidation.DependencyInjectionExtensions` | 12.1.1 |
 | Application | `Microsoft.EntityFrameworkCore` | 10.0.12 |
 | Application | `Microsoft.Extensions.Configuration.Abstractions` | 10.0.0 |
-| Infrastructure | `Microsoft.EntityFrameworkCore.SqlServer` | 10.0.12 |
+| Infrastructure | `Npgsql.EntityFrameworkCore.PostgreSQL` | 10.0.3 |
 | Infrastructure | `Microsoft.Extensions.Http` | 10.0.12 |
 | Infrastructure | `Microsoft.Extensions.Options.ConfigurationExtensions` | 10.0.12 |
 | Infrastructure | `System.IdentityModel.Tokens.Jwt` | 8.14.0 |

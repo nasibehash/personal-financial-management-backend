@@ -3,6 +3,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using PersonalFinancialManagement.Application;
 using PersonalFinancialManagement.Application.DTOs;
 using PersonalFinancialManagement.Application.Features.Commands.CreateAccount;
@@ -13,6 +14,7 @@ using PersonalFinancialManagement.Domain.Enums;
 using PersonalFinancialManagement.Infrastructure.Options;
 using PersonalFinancialManagement.Infrastructure.Persistence;
 using PersonalFinancialManagement.Infrastructure.Services;
+using PersonalFinancialManagement.Infrastructure.Services.Ai;
 
 namespace PersonalFinancialManagement.Tests.Support;
 
@@ -50,6 +52,17 @@ public sealed class TestApp : IDisposable
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
+        // AI: no API key by default, so the built-in rules are used; tests can set Ai.ApiKey and script Llm.
+        services.AddSingleton<IOptions<AiOptions>>(Options.Create(Ai));
+        services.AddSingleton<ILlmClient>(Llm);
+        services.AddSingleton<ISpeechToTextService>(Speech);
+        services.AddTransient<LlmTransactionTextParser>();
+        services.AddSingleton<RuleBasedTransactionTextParser>();
+        services.AddTransient<ITransactionTextParser, TransactionTextParser>();
+        services.AddTransient<LlmFinancialInsightGenerator>();
+        services.AddSingleton<RuleBasedInsightGenerator>();
+        services.AddTransient<IFinancialInsightGenerator, FinancialInsightGenerator>();
+
         configure?.Invoke(services);
 
         Services = services.BuildServiceProvider(validateScopes: true);
@@ -63,6 +76,12 @@ public sealed class TestApp : IDisposable
     public FakeClock Clock { get; } = new(new DateTime(2026, 10, 15, 12, 0, 0, DateTimeKind.Utc));
 
     public FakeCurrentUser CurrentUser { get; } = new();
+
+    public AiOptions Ai { get; } = new();
+
+    public FakeLlmClient Llm { get; } = new("{}");
+
+    public FakeSpeechToText Speech { get; } = new();
 
     // Each call runs in its own scope, like a separate HTTP request.
     public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request)

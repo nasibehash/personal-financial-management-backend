@@ -5,11 +5,12 @@ namespace PersonalFinancialManagement.Tests.Support;
 // Returns canned replies (or throws) instead of calling a language model, and records what it was asked.
 public class FakeLlmClient : ILlmClient
 {
-    private readonly Func<string, string> _reply;
+    public FakeLlmClient(string reply) => Reply = _ => reply;
 
-    public FakeLlmClient(string reply) => _reply = _ => reply;
+    public FakeLlmClient(Func<string, string> reply) => Reply = reply;
 
-    public FakeLlmClient(Func<string, string> reply) => _reply = reply;
+    // Maps the user prompt to the reply; tests may replace it.
+    public Func<string, string> Reply { get; set; }
 
     public int Calls { get; private set; }
 
@@ -22,7 +23,7 @@ public class FakeLlmClient : ILlmClient
         Calls++;
         LastSystemPrompt = systemPrompt;
         LastUserPrompt = userPrompt;
-        return Task.FromResult(_reply(userPrompt));
+        return Task.FromResult(Reply(userPrompt));
     }
 
     public static FakeLlmClient Failing(Exception exception) => new(_ => throw exception);

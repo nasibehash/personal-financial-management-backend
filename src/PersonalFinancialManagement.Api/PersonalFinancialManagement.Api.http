@@ -315,3 +315,52 @@ DELETE {{HostAddress}}/api/goals/{{goalId}}
 Authorization: Bearer {{token}}
 
 ###
+
+### AI: record a transaction from a sentence (preview: true only shows how it was understood)
+POST {{HostAddress}}/api/ai/transactions/text
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "text": "دیروز ناهار ۲۵۰ هزار تومان",
+  "preview": true
+}
+
+###
+
+### AI: record a transaction from a sentence (saved; optional accountId)
+POST {{HostAddress}}/api/ai/transactions/text
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "text": "حقوق ۳۰ میلیون دریافت شد",
+  "accountId": "{{accountId}}"
+}
+
+###
+
+### AI: record a transaction from a voice recording (multipart; mp3, m4a, wav, webm, ogg, ...)
+POST {{HostAddress}}/api/ai/transactions/voice
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=VoiceBoundary
+
+--VoiceBoundary
+Content-Disposition: form-data; name="audio"; filename="note.m4a"
+Content-Type: audio/mp4
+
+< ./note.m4a
+--VoiceBoundary
+Content-Disposition: form-data; name="preview"
+
+true
+--VoiceBoundary--
+
+###
+
+### AI: insights about the period (from/to optional)
+GET {{HostAddress}}/api/ai/insights?from=2026-10-01&to=2026-10-31
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###

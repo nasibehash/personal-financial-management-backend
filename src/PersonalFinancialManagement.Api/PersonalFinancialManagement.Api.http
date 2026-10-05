@@ -2,3 +2,365 @@
 
 GET {{HostAddress}}/api/health
 Accept: application/json
+
+###
+
+### Auth: register (stores the returned token in the "token" variable)
+POST {{HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Sara Ahmadi",
+  "email": "sara@example.com",
+  "password": "Passw0rd123"
+}
+
+> {%
+    client.global.set("token", response.body.token);
+%}
+
+###
+
+### Auth: login (stores the returned token in the "token" variable)
+POST {{HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "sara@example.com",
+  "password": "Passw0rd123"
+}
+
+> {%
+    client.global.set("token", response.body.token);
+%}
+
+###
+
+### Auth: current user
+GET {{HostAddress}}/api/auth/me
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Categories: list (optional ?type=Income|Expense)
+GET {{HostAddress}}/api/categories?type=Expense
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Categories: create
+POST {{HostAddress}}/api/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Pets",
+  "type": "Expense"
+}
+
+> {%
+    client.global.set("categoryId", response.body.id);
+%}
+
+###
+
+### Categories: rename
+PUT {{HostAddress}}/api/categories/{{categoryId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Animals"
+}
+
+###
+
+### Categories: delete
+DELETE {{HostAddress}}/api/categories/{{categoryId}}
+Authorization: Bearer {{token}}
+
+###
+
+### Accounts: list (optional ?includeArchived=true)
+GET {{HostAddress}}/api/accounts
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Accounts: create (type: Cash, BankAccount, Card, Savings, DigitalWallet, Other)
+POST {{HostAddress}}/api/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Main wallet",
+  "type": "Cash",
+  "initialBalance": 1500000
+}
+
+> {%
+    client.global.set("accountId", response.body.id);
+%}
+
+###
+
+### Accounts: get one (with current balance)
+GET {{HostAddress}}/api/accounts/{{accountId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Accounts: update (set isArchived to true to hide it)
+PUT {{HostAddress}}/api/accounts/{{accountId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Main wallet",
+  "type": "Cash",
+  "initialBalance": 1500000,
+  "isArchived": false
+}
+
+###
+
+### Accounts: delete (only accounts without transactions)
+DELETE {{HostAddress}}/api/accounts/{{accountId}}
+Authorization: Bearer {{token}}
+
+###
+
+### Transactions: create an expense (needs an expense category id and an account id)
+POST {{HostAddress}}/api/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "Expense",
+  "amount": 250000,
+  "accountId": "{{accountId}}",
+  "categoryId": "{{expenseCategoryId}}",
+  "date": "2026-10-05T09:30:00Z",
+  "description": "Lunch with friends"
+}
+
+> {%
+    client.global.set("transactionId", response.body.id);
+%}
+
+###
+
+### Transactions: create an income (needs an income category id)
+POST {{HostAddress}}/api/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "Income",
+  "amount": 30000000,
+  "accountId": "{{accountId}}",
+  "categoryId": "{{incomeCategoryId}}",
+  "description": "October salary"
+}
+
+###
+
+### Transactions: transfer between two accounts (no category)
+POST {{HostAddress}}/api/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "Transfer",
+  "amount": 5000000,
+  "accountId": "{{accountId}}",
+  "destinationAccountId": "{{otherAccountId}}"
+}
+
+###
+
+### Transactions: list with filters and paging
+GET {{HostAddress}}/api/transactions?from=2026-10-01&to=2026-10-31&type=Expense&page=1&pageSize=20
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Transactions: get one
+GET {{HostAddress}}/api/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Transactions: update
+PUT {{HostAddress}}/api/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "Expense",
+  "amount": 270000,
+  "accountId": "{{accountId}}",
+  "categoryId": "{{expenseCategoryId}}",
+  "description": "Lunch with friends (corrected)"
+}
+
+###
+
+### Transactions: delete
+DELETE {{HostAddress}}/api/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+
+###
+
+### Reports: summary (income, expense, net, savings rate, balance). from/to are optional.
+GET {{HostAddress}}/api/reports/summary?from=2026-10-01&to=2026-10-31
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Reports: spending (or income) per category
+GET {{HostAddress}}/api/reports/category-breakdown?type=Expense&from=2026-10-01&to=2026-10-31
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Reports: income vs expense for the last N months
+GET {{HostAddress}}/api/reports/monthly-trend?months=6
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Reports: this period compared with the previous one of the same length
+GET {{HostAddress}}/api/reports/comparison?from=2026-10-01&to=2026-10-31
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Goals: create
+POST {{HostAddress}}/api/goals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "New laptop",
+  "targetAmount": 60000000,
+  "deadline": "2027-03-20",
+  "description": "Saving for a work laptop"
+}
+
+> {%
+    client.global.set("goalId", response.body.id);
+%}
+
+###
+
+### Goals: list (optional ?status=Active|Completed|Cancelled)
+GET {{HostAddress}}/api/goals
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Goals: get one with its contributions
+GET {{HostAddress}}/api/goals/{{goalId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Goals: update (isCancelled true cancels, false reopens)
+PUT {{HostAddress}}/api/goals/{{goalId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "New laptop",
+  "targetAmount": 65000000,
+  "deadline": "2027-03-20",
+  "isCancelled": false
+}
+
+###
+
+### Goals: add a contribution (returns the goal with its progress)
+POST {{HostAddress}}/api/goals/{{goalId}}/contributions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 5000000,
+  "note": "October saving"
+}
+
+###
+
+### Goals: remove a contribution
+DELETE {{HostAddress}}/api/goals/{{goalId}}/contributions/{{contributionId}}
+Authorization: Bearer {{token}}
+
+###
+
+### Goals: delete
+DELETE {{HostAddress}}/api/goals/{{goalId}}
+Authorization: Bearer {{token}}
+
+###
+
+### AI: record a transaction from a sentence (preview: true only shows how it was understood)
+POST {{HostAddress}}/api/ai/transactions/text
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "text": "دیروز ناهار ۲۵۰ هزار تومان",
+  "preview": true
+}
+
+###
+
+### AI: record a transaction from a sentence (saved; optional accountId)
+POST {{HostAddress}}/api/ai/transactions/text
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "text": "حقوق ۳۰ میلیون دریافت شد",
+  "accountId": "{{accountId}}"
+}
+
+###
+
+### AI: record a transaction from a voice recording (multipart; mp3, m4a, wav, webm, ogg, ...)
+POST {{HostAddress}}/api/ai/transactions/voice
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=VoiceBoundary
+
+--VoiceBoundary
+Content-Disposition: form-data; name="audio"; filename="note.m4a"
+Content-Type: audio/mp4
+
+< ./note.m4a
+--VoiceBoundary
+Content-Disposition: form-data; name="preview"
+
+true
+--VoiceBoundary--
+
+###
+
+### AI: insights about the period (from/to optional)
+GET {{HostAddress}}/api/ai/insights?from=2026-10-01&to=2026-10-31
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###

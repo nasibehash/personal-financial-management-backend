@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PersonalFinancialManagement.Application.Common.Behaviors;
+using PersonalFinancialManagement.Application.Services;
 
 namespace PersonalFinancialManagement.Application;
 
@@ -26,6 +27,8 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(assembly);
+
+        services.AddScoped<TransactionTextProcessor>();
 
         return services;
     }

@@ -42,11 +42,11 @@ if (app.Environment.IsDevelopment())
     }
     catch (DbException ex)
     {
-        // Most often SQL Server (or LocalDB) is not installed or the connection string points to the wrong server.
+        // Most often the connection string points to the wrong server or database, or the credentials are wrong.
         app.Logger.LogCritical(
             "Could not set up the database on '{DataSource}': {Message}\n" +
-            "Check 'ConnectionStrings:DefaultConnection'. To use another SQL Server, put the connection string in " +
-            "appsettings.Local.json (see the README, section \"Database connection problems\").",
+            "Check 'ConnectionStrings:DefaultConnection'. Put your own connection string (for example the one from Neon) in " +
+            "appsettings.Local.json (see the README, section \"Database\").",
             db.Database.GetDbConnection().DataSource,
             ex.Message);
 

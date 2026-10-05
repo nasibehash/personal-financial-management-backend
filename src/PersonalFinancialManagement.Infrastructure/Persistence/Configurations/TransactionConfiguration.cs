@@ -13,7 +13,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.Property(t => t.Amount).HasPrecision(18, 2);
         builder.Property(t => t.Description).HasMaxLength(500);
 
-        // SQL Server rejects multiple cascade paths, so every relationship here is restrictive.
+        // Deleting a user, account or category must never silently delete transactions, so every relationship is restrictive.
         builder.HasOne(t => t.User)
             .WithMany()
             .HasForeignKey(t => t.UserId)

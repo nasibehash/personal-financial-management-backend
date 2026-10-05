@@ -47,8 +47,9 @@ public class GetTransactionsQueryHandler : IRequestHandler<GetTransactionsQuery,
 
         if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            var term = request.Search.Trim();
-            query = query.Where(t => t.Description != null && t.Description.Contains(term));
+            // Lower-cased on both sides so the search is case-insensitive on every database.
+            var term = request.Search.Trim().ToLower();
+            query = query.Where(t => t.Description != null && t.Description.ToLower().Contains(term));
         }
 
         var totalCount = await query.CountAsync(cancellationToken);

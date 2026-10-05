@@ -1,6 +1,10 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using PersonalFinancialManagement.Api.Extensions;
 using PersonalFinancialManagement.Api.Middleware;
+using PersonalFinancialManagement.Api.Services;
 using PersonalFinancialManagement.Application;
+using PersonalFinancialManagement.Application.Interfaces;
 using PersonalFinancialManagement.Infrastructure;
 using PersonalFinancialManagement.Infrastructure.Persistence;
 
@@ -14,7 +18,12 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -37,6 +46,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

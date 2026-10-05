@@ -30,9 +30,10 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// Pending EF Core migrations are applied automatically while developing; elsewhere (e.g. the first deploy)
+// set Database:MigrateOnStartup=true (environment variable Database__MigrateOnStartup).
+if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
 {
-    // Apply pending EF Core migrations automatically while developing.
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
@@ -63,7 +64,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// In production TLS is terminated by the hosting platform, which forwards plain HTTP to the container.
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

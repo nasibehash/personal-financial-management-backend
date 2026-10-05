@@ -5,4 +5,7 @@
     <Project Path="src/PersonalFinancialManagement.Domain/PersonalFinancialManagement.Domain.csproj" />
     <Project Path="src/PersonalFinancialManagement.Infrastructure/PersonalFinancialManagement.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PersonalFinancialManagement.Tests/PersonalFinancialManagement.Tests.csproj" />
+  </Folder>
 </Solution>

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PersonalFinancialManagement.Application.Interfaces;
 using PersonalFinancialManagement.Infrastructure.Persistence;
+using PersonalFinancialManagement.Infrastructure.Services;
 
 namespace PersonalFinancialManagement.Infrastructure;
 
@@ -16,6 +17,8 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
+
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         return services;
     }

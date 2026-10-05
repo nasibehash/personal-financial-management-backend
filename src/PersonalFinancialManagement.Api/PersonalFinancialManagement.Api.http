@@ -42,3 +42,43 @@ Authorization: Bearer {{token}}
 Accept: application/json
 
 ###
+
+### Categories: list (optional ?type=Income|Expense)
+GET {{HostAddress}}/api/categories?type=Expense
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Categories: create
+POST {{HostAddress}}/api/categories
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Pets",
+  "type": "Expense"
+}
+
+> {%
+    client.global.set("categoryId", response.body.id);
+%}
+
+###
+
+### Categories: rename
+PUT {{HostAddress}}/api/categories/{{categoryId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Animals"
+}
+
+###
+
+### Categories: delete
+DELETE {{HostAddress}}/api/categories/{{categoryId}}
+Authorization: Bearer {{token}}
+
+###

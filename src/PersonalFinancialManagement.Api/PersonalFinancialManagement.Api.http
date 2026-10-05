@@ -245,3 +245,73 @@ Authorization: Bearer {{token}}
 Accept: application/json
 
 ###
+
+### Goals: create
+POST {{HostAddress}}/api/goals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "New laptop",
+  "targetAmount": 60000000,
+  "deadline": "2027-03-20",
+  "description": "Saving for a work laptop"
+}
+
+> {%
+    client.global.set("goalId", response.body.id);
+%}
+
+###
+
+### Goals: list (optional ?status=Active|Completed|Cancelled)
+GET {{HostAddress}}/api/goals
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Goals: get one with its contributions
+GET {{HostAddress}}/api/goals/{{goalId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Goals: update (isCancelled true cancels, false reopens)
+PUT {{HostAddress}}/api/goals/{{goalId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "New laptop",
+  "targetAmount": 65000000,
+  "deadline": "2027-03-20",
+  "isCancelled": false
+}
+
+###
+
+### Goals: add a contribution (returns the goal with its progress)
+POST {{HostAddress}}/api/goals/{{goalId}}/contributions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 5000000,
+  "note": "October saving"
+}
+
+###
+
+### Goals: remove a contribution
+DELETE {{HostAddress}}/api/goals/{{goalId}}/contributions/{{contributionId}}
+Authorization: Bearer {{token}}
+
+###
+
+### Goals: delete
+DELETE {{HostAddress}}/api/goals/{{goalId}}
+Authorization: Bearer {{token}}
+
+###

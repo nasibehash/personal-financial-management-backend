@@ -217,3 +217,31 @@ DELETE {{HostAddress}}/api/transactions/{{transactionId}}
 Authorization: Bearer {{token}}
 
 ###
+
+### Reports: summary (income, expense, net, savings rate, balance). from/to are optional.
+GET {{HostAddress}}/api/reports/summary?from=2026-10-01&to=2026-10-31
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Reports: spending (or income) per category
+GET {{HostAddress}}/api/reports/category-breakdown?type=Expense&from=2026-10-01&to=2026-10-31
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Reports: income vs expense for the last N months
+GET {{HostAddress}}/api/reports/monthly-trend?months=6
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Reports: this period compared with the previous one of the same length
+GET {{HostAddress}}/api/reports/comparison?from=2026-10-01&to=2026-10-31
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###

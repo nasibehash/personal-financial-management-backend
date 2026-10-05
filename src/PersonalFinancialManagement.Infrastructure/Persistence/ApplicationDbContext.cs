@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PersonalFinancialManagement.Application.Interfaces;
 using PersonalFinancialManagement.Domain.Common;
+using PersonalFinancialManagement.Domain.Entities;
 
 namespace PersonalFinancialManagement.Infrastructure.Persistence;
 
@@ -11,8 +12,12 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
     }
 
-    // Add a DbSet<T> here for each entity, e.g.:
-    // public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Account> Accounts => Set<Account>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<Goal> Goals => Set<Goal>();
+    public DbSet<GoalContribution> GoalContributions => Set<GoalContribution>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

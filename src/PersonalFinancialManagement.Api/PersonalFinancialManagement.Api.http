@@ -82,3 +82,54 @@ DELETE {{HostAddress}}/api/categories/{{categoryId}}
 Authorization: Bearer {{token}}
 
 ###
+
+### Accounts: list (optional ?includeArchived=true)
+GET {{HostAddress}}/api/accounts
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Accounts: create (type: Cash, BankAccount, Card, Savings, DigitalWallet, Other)
+POST {{HostAddress}}/api/accounts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Main wallet",
+  "type": "Cash",
+  "initialBalance": 1500000
+}
+
+> {%
+    client.global.set("accountId", response.body.id);
+%}
+
+###
+
+### Accounts: get one (with current balance)
+GET {{HostAddress}}/api/accounts/{{accountId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Accounts: update (set isArchived to true to hide it)
+PUT {{HostAddress}}/api/accounts/{{accountId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Main wallet",
+  "type": "Cash",
+  "initialBalance": 1500000,
+  "isArchived": false
+}
+
+###
+
+### Accounts: delete (only accounts without transactions)
+DELETE {{HostAddress}}/api/accounts/{{accountId}}
+Authorization: Bearer {{token}}
+
+###

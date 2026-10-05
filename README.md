@@ -54,6 +54,25 @@ automatically) or in environment variables such as `Jwt__SecretKey`.
 | `Ai:ApiKey` | Optional, see [AI](#ai). |
 | `MediatR:LicenseKey` | MediatR 13+ is commercially licensed (a free Community license exists). Without a key it still works and logs a license warning. |
 
+### Database connection problems
+
+The default connection string uses SQL Server **LocalDB** (installed with Visual Studio). If it is not installed
+(`Unable to locate a Local Database Runtime installation`) or you use another SQL Server, create
+`src/PersonalFinancialManagement.Api/appsettings.Local.json` (git-ignored) with your connection string:
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=.\\SQLEXPRESS;Database=PersonalFinancialManagement;Trusted_Connection=True;TrustServerCertificate=True"
+  }
+}
+```
+
+Common values for `Server`: `.\SQLEXPRESS` (SQL Server Express), `localhost` or `.` (default instance), `localhost,1433` with
+`User Id=sa;Password=...` (Docker). To see which SQL Server services exist on Windows run `Get-Service *SQL*` in PowerShell
+(`MSSQL$SQLEXPRESS` means the instance is `.\SQLEXPRESS`, `MSSQLSERVER` means the default instance). If the app cannot reach the
+database at startup in Development it logs the server it tried and exits.
+
 ### Database migrations
 
 The initial migration is included (`Infrastructure/Persistence/Migrations`). After changing entities:

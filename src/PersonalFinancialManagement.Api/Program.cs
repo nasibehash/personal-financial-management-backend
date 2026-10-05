@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using PersonalFinancialManagement.Api.Extensions;
@@ -33,7 +34,25 @@ if (app.Environment.IsDevelopment())
 {
     // Apply pending EF Core migrations automatically while developing.
     using var scope = app.Services.CreateScope();
-    await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    try
+    {
+        await db.Database.MigrateAsync();
+    }
+    catch (DbException ex)
+    {
+        // Most often SQL Server (or LocalDB) is not installed or the connection string points to the wrong server.
+        app.Logger.LogCritical(
+            "Could not set up the database on '{DataSource}': {Message}\n" +
+            "Check 'ConnectionStrings:DefaultConnection'. To use another SQL Server, put the connection string in " +
+            "appsettings.Local.json (see the README, section \"Database connection problems\").",
+            db.Database.GetDbConnection().DataSource,
+            ex.Message);
+
+        Environment.ExitCode = 1;
+        return;
+    }
 }
 
 // Configure the HTTP request pipeline.

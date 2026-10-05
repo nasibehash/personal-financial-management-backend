@@ -5,8 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PersonalFinancialManagement.Application;
 using PersonalFinancialManagement.Application.DTOs;
+using PersonalFinancialManagement.Application.Features.Commands.CreateAccount;
 using PersonalFinancialManagement.Application.Features.Commands.RegisterUser;
+using PersonalFinancialManagement.Application.Features.Queries.GetCategories;
 using PersonalFinancialManagement.Application.Interfaces;
+using PersonalFinancialManagement.Domain.Enums;
 using PersonalFinancialManagement.Infrastructure.Options;
 using PersonalFinancialManagement.Infrastructure.Persistence;
 using PersonalFinancialManagement.Infrastructure.Services;
@@ -95,6 +98,16 @@ public sealed class TestApp : IDisposable
         var result = await Send(new RegisterUserCommand(fullName, email, "Passw0rd123"));
         CurrentUser.Id = result.User.Id;
         return result.User;
+    }
+
+    public Task<AccountDto> CreateAccount(string name = "Main wallet", decimal initialBalance = 0)
+        => Send(new CreateAccountCommand(name, AccountType.Cash, initialBalance));
+
+    // Looks up one of the current user's categories by name.
+    public async Task<Guid> CategoryId(string name, CategoryType type)
+    {
+        var categories = await Send(new GetCategoriesQuery(type));
+        return categories.Single(c => c.Name == name).Id;
     }
 
     public void Dispose()

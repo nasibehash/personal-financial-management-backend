@@ -133,3 +133,87 @@ DELETE {{HostAddress}}/api/accounts/{{accountId}}
 Authorization: Bearer {{token}}
 
 ###
+
+### Transactions: create an expense (needs an expense category id and an account id)
+POST {{HostAddress}}/api/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "Expense",
+  "amount": 250000,
+  "accountId": "{{accountId}}",
+  "categoryId": "{{expenseCategoryId}}",
+  "date": "2026-10-05T09:30:00Z",
+  "description": "Lunch with friends"
+}
+
+> {%
+    client.global.set("transactionId", response.body.id);
+%}
+
+###
+
+### Transactions: create an income (needs an income category id)
+POST {{HostAddress}}/api/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "Income",
+  "amount": 30000000,
+  "accountId": "{{accountId}}",
+  "categoryId": "{{incomeCategoryId}}",
+  "description": "October salary"
+}
+
+###
+
+### Transactions: transfer between two accounts (no category)
+POST {{HostAddress}}/api/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "Transfer",
+  "amount": 5000000,
+  "accountId": "{{accountId}}",
+  "destinationAccountId": "{{otherAccountId}}"
+}
+
+###
+
+### Transactions: list with filters and paging
+GET {{HostAddress}}/api/transactions?from=2026-10-01&to=2026-10-31&type=Expense&page=1&pageSize=20
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Transactions: get one
+GET {{HostAddress}}/api/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Transactions: update
+PUT {{HostAddress}}/api/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "Expense",
+  "amount": 270000,
+  "accountId": "{{accountId}}",
+  "categoryId": "{{expenseCategoryId}}",
+  "description": "Lunch with friends (corrected)"
+}
+
+###
+
+### Transactions: delete
+DELETE {{HostAddress}}/api/transactions/{{transactionId}}
+Authorization: Bearer {{token}}
+
+###
